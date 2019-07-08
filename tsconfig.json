@@ -22,6 +22,7 @@
         "removeComments": true
     },
     "include": [
-        "src/**/*"
+        "lib/**/*",
+        "app/**/*"
     ]
 }
