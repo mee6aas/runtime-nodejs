@@ -16,13 +16,14 @@
         "noImplicitAny": false,
         "noImplicitThis": false,
         "strictNullChecks": true,
-        
-        "rootDir": ".",
-        "outDir": "dist",
-        "removeComments": true
+        "rootDir": "src",
+        "outDir": "build"
     },
     "include": [
-        "lib/**/*",
-        "app/**/*"
+        "src/lib/**/*",
+        "src/app/**/*"
+    ],
+    "exclude": [
+        "src/lib/**/*.pre.js"
     ]
 }

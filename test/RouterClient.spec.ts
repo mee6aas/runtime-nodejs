@@ -1,10 +1,10 @@
 import { expect } from "chai";
 import * as grpc from "grpc";
 
-import * as mockServer from "../mock/server/index";
+import * as mockServer from "./mock/server/index";
 
-import * as routerMsg from "../lib/api/proto/v1/router_pb";
-import RouterClient from "../lib/RouterClient";
+import * as routerMsg from "../src/lib/api/proto/v1/router_pb";
+import RouterClient from "../src/lib/RouterClient";
 
 describe("Router client with the mock server", () => {
     const routerClient = new RouterClient();

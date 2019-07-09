@@ -1,6 +1,10 @@
 import { ChildProcess, fork } from "child_process";
 import * as path from "path";
 
+import * as errors from "http-errors";
+
+import Message from "./workerMessage.pre";
+
 class Invoker {
     public readonly pid: number;
 
@@ -13,7 +17,7 @@ class Invoker {
     private _rejectInit: ((any) => void) | undefined;
 
     constructor(timeout = 1000) {
-        const proc = fork(path.join(__dirname, "worker.ts"), [], {
+        const proc = fork(path.join(__dirname, "worker.pre.js"), [], {
             // stdio: "ignore",
         });
 
@@ -29,19 +33,23 @@ class Invoker {
             this._rejectInit = () => {
                 if (isRejected) { return; }
                 isRejected = true;
-                reject("canceled");
+                reject(new errors.BadRequest("canceled"));
             };
             proc.once("message", (msg) => {
-                if (msg !== "ACK") {
-                    reject(new Error("Failed to ready"));
+                const res = Message.parse(msg);
+                const err = res.toError();
+
+                if (err) {
+                    reject(err);
                     return;
                 }
+
                 resolve();
             });
             setTimeout(() => {
                 if (isRejected) { return; }
                 isRejected = true;
-                reject(new Error(`Timeout of ${timeout}ms exceeded to initiate Invoker`));
+                reject(new errors.RequestTimeout(`Timeout of ${timeout}ms exceeded to initiate Invoker`));
             }, timeout);
         });
         this._ready.catch(() => { this.destroy(); });
@@ -56,17 +64,20 @@ class Invoker {
         return this._checkAvailable().then(() => {
             return new Promise<void>((resolve, reject) => {
                 if (this._isloaded) {
-                    reject(new Error("Already loaded"));
+                    reject(new errors.Forbidden("Already loaded"));
                     return;
                 }
 
                 this._isloaded = true;
 
-                this._worker.once("message", (msg: string | Error) => {
-                    if (msg !== "ACK") {
-                        reject(msg);
+                this._worker.once("message", (msg: string) => {
+                    const res = Message.parse(msg);
+                    const err = res.toError();
+                    if (err) {
+                        reject(err);
                         return;
                     }
+
                     resolve();
                 });
 
@@ -79,7 +90,7 @@ class Invoker {
         return this._checkAvailable().then(() => {
             return new Promise<string>((resolve, reject) => {
                 if (this._isRunning) {
-                    reject(new Error("Already running"));
+                    reject(new errors.Forbidden("Already running"));
                     return;
                 }
 
@@ -118,7 +129,7 @@ class Invoker {
     private _checkDestroyed() {
         return new Promise((resolve, reject) => {
             if (this._isDestroyed) {
-                reject(new Error("Destroyed Invoker"));
+                reject(new errors.NotAcceptable("Destroyed Invoker"));
                 return;
             }
             resolve();

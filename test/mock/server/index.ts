@@ -1,7 +1,7 @@
 import * as grpc from "grpc";
 
-import * as routerSvc from "../../lib/api/proto/v1/router_grpc_pb";
-import * as routerMsg from "../../lib/api/proto/v1/router_pb";
+import * as routerSvc from "../../../src/lib/api/proto/v1/router_grpc_pb";
+import * as routerMsg from "../../../src/lib/api/proto/v1/router_pb";
 
 let isEchoMode = false;
 let server: grpc.Server;

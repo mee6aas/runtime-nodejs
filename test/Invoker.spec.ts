@@ -3,7 +3,7 @@ import * as chaiAsPromised from "chai-as-promised";
 import * as isRunning from "is-running";
 import * as path from "path";
 
-import Invoker from "../lib/Invoker";
+import Invoker from "../src/lib/Invoker";
 
 use(chaiAsPromised);
 
@@ -11,7 +11,7 @@ use(chaiAsPromised);
 
 // TODO: test to see what error occurred.
 
-describe("Invoker", () => {
+describe.only("Invoker", () => {
     let invoker: Invoker;
 
     describe("create and destory", () => {
@@ -49,26 +49,26 @@ describe("Invoker", () => {
         });
 
         it("should load moudle", async () => {
-            await expect(invoker.load(path.resolve(__dirname, "./func"))).to.eventually
+            await expect(invoker.load(path.resolve(__dirname, "./mock/func"))).to.eventually
                 .be.fulfilled;
         });
 
         it("should fail when load twice", async () => {
-            await expect(invoker.load(path.resolve(__dirname, "./func"))
+            await expect(invoker.load(path.resolve(__dirname, "./mock/func"))
                 .then(() => {
-                    return invoker.load(path.resolve(__dirname, "./func"));
+                    return invoker.load(path.resolve(__dirname, "./mock/func"));
                 })).to.eventually
                 .be.rejected;
         });
 
         it("should invoke a function", async () => {
-            await invoker.load(path.resolve(__dirname, "./func"));
+            await invoker.load(path.resolve(__dirname, "./mock/func"));
             await expect(invoker.invoke()).to.eventually
                 .be.fulfilled;
         });
 
         it(`should return "I'm Mr. Meeseeks, look at me!"`, async () => {
-            await invoker.load(path.resolve(__dirname, "./func"));
+            await invoker.load(path.resolve(__dirname, "./mock/func"));
             await expect(invoker.invoke()).to.eventually
                 .be.equals(JSON.stringify("I'm Mr. Meeseeks, look at me!"));
         });
