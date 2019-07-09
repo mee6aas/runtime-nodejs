@@ -30,32 +30,36 @@ process.once("message", (trg) => {
         task = require(trg);
     } catch (e) {
         if (e.code === "MODULE_NOT_FOUND") {
-            _send(new Message(CODE.NOT_FOUND, "module not found"));
+            _send(new Message(CODE.NOT_FOUND, "Module not found"));
         } else {
-            _send(OK);
+            _send(new Message(CODE.INTERNAL_SERVER_ERROR, e.message));
         }
         process.exit(1);
     }
 
     if (typeof task !== "function") {
-        _send(new Message(CODE.BAD_REQUEST, "Not a function"));
+        _send(new Message(CODE.METHOD_NOT_ALLOWED, "Not a function"));
         process.exit(1);
-    } else {
-        _send(OK);
     }
+
+    _send(OK);
 
     // TODO: make message to Message
     process.on("message", task.constructor.name === "AsyncFunction"
         ? (msg) => {
             task(msg).then((rst) => {
-                // @ts-ignore:2722
-                process.send(JSON.stringify(rst) || "");
+                _send(new Message(CODE.OK, JSON.stringify(rst)));
+            }, (err) => {
+                _send(new Message(CODE.RESET_CONTENT, err.stack));
             });
         }
         : (msg) => {
-            const rst = task(msg);
-            // @ts-ignore:2722
-            process.send(JSON.stringify(rst) || "");
+            try {
+                const rst = task(msg);
+                _send(new Message(CODE.OK, JSON.stringify(rst)));
+            } catch (err) {
+                _send(new Message(CODE.RESET_CONTENT, err.stack));
+            }
         },
     );
 });

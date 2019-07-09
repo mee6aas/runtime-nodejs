@@ -2,8 +2,14 @@ import { ChildProcess, fork } from "child_process";
 import * as path from "path";
 
 import * as errors from "http-errors";
+import * as CODE from "http-status-codes";
 
 import Message from "./workerMessage.pre";
+
+interface IInvokeResult {
+    isThrown: boolean;
+    result: string;
+}
 
 class Invoker {
     public readonly pid: number;
@@ -14,7 +20,7 @@ class Invoker {
     private _isRunning = false;
     private _isDestroyed = false;
 
-    private _rejectInit: ((any) => void) | undefined;
+    private _rejectInit: (() => void) | undefined;
 
     constructor(timeout = 1000) {
         const proc = fork(path.join(__dirname, "worker.pre.js"), [], {
@@ -31,9 +37,10 @@ class Invoker {
             let isRejected = false;
 
             this._rejectInit = () => {
+                this._isDestroyed = true;
                 if (isRejected) { return; }
                 isRejected = true;
-                reject(new errors.BadRequest("canceled"));
+                reject(new errors.BadRequest("init canceled"));
             };
             proc.once("message", (msg) => {
                 const res = Message.parse(msg);
@@ -88,7 +95,7 @@ class Invoker {
 
     public invoke(trg: string = "") {
         return this._checkAvailable().then(() => {
-            return new Promise<string>((resolve, reject) => {
+            return new Promise<IInvokeResult>((resolve, reject) => {
                 if (this._isRunning) {
                     reject(new errors.Forbidden("Already running"));
                     return;
@@ -98,13 +105,23 @@ class Invoker {
 
                 this._worker.send(path.resolve(trg));
                 this._worker.once("message", (msg) => {
-                    resolve(msg);
-                });
+                    const res = Message.parse(msg);
+                    const err = res.toError();
 
-                this._rejectInit = reject;
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    const rst: IInvokeResult = {
+                        isThrown: res.code === CODE.RESET_CONTENT,
+                        result: res.info,
+                    };
+
+                    resolve(rst);
+                });
             }).finally(() => {
                 this._isRunning = false;
-                this._rejectInit = undefined;
             });
         });
     }
@@ -118,7 +135,7 @@ class Invoker {
         }
 
         if (this._rejectInit !== undefined) {
-            this._rejectInit("Destroyed");
+            this._rejectInit();
         }
 
         this._worker.kill("SIGKILL");
@@ -129,7 +146,7 @@ class Invoker {
     private _checkDestroyed() {
         return new Promise((resolve, reject) => {
             if (this._isDestroyed) {
-                reject(new errors.NotAcceptable("Destroyed Invoker"));
+                reject(new errors.BadRequest("Destroyed Invoker"));
                 return;
             }
             resolve();

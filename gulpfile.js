@@ -22,6 +22,7 @@ function giveName(fn, name) {
 
 function prebuild() {
     let tsProject = ts.createProject("tsconfig.prebuild.json");
+
     return tsProject.src()
         .pipe(tsProject())
         .js.pipe(
@@ -74,6 +75,8 @@ function testSpecs() {
 // Please teache me if you know the problem. 
 const test = gulp.series(prebuild, testSpecs)
 
+const testOnly = testSpecs
+
 //
 // clean
 //
@@ -99,6 +102,9 @@ module.exports = {
 
     // run test in ./test/**/*.spec.ts
     test,
+
+    // run test in ./test/**/*.spec.ts without prebuild
+    testOnly,
 
     // show deleted files by `cleanPrebuilt`
     dryCleanPrebuilt,
