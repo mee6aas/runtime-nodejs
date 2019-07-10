@@ -14,20 +14,55 @@ use(chaiAsPromised);
 // TODO: test to see what error occurred.
 
 describe("Invoker", () => {
-    describe("create and destroy", () => {
+    describe("manage worker", () => {
         let invoker: Invoker;
 
-        it("should fork worker process", async () => {
+        it("by forking worker process", async () => {
             expect(() => { invoker = new Invoker(); }).not.to.throw();
             expect(isRunning(invoker.pid)).to.be.true;
             await expect(invoker.ready()).to.eventually
                 .be.fulfilled;
         });
 
-        it("should be destroyed", () => {
+        it("by destroying worker process", () => {
             invoker.destroy();
 
             expect(isRunning(invoker.pid)).to.be.false;
+        });
+    });
+
+    describe("load a function", () => {
+        let invoker: Invoker;
+
+        beforeEach(() => {
+            invoker = new Invoker();
+        });
+
+        afterEach(() => {
+            invoker.destroy();
+        });
+
+        it("that is valid", async () => {
+            await expect(invoker.load(path.resolve(__dirname, "./mock/func"))).to.eventually
+                .be.fulfilled;
+        });
+
+        it("but fail if the function that can not be found", async () => {
+            await expect(invoker.load("not exists")).to.eventually
+                .be.rejectedWith(errors.NotFound);
+        });
+
+        it("but fail if the function is not a function", async () => {
+            await expect(invoker.load(path.resolve(__dirname, "./mock/notFunc"))).to.eventually
+                .be.rejectedWith(errors.MethodNotAllowed);
+        });
+
+        it("but fail when trying to load using an Invoker that already loaded a function", async () => {
+            await expect(invoker.load(path.resolve(__dirname, "./mock/func"))
+                .then(() => {
+                    return invoker.load(path.resolve(__dirname, "./mock/func"));
+                })).to.eventually
+                .be.rejectedWith(errors.Forbidden);
         });
     });
 
@@ -42,36 +77,13 @@ describe("Invoker", () => {
             invoker.destroy();
         });
 
-        it("should fail when loading a module that can not be found", async () => {
-            await expect(invoker.load("not exists")).to.eventually
-                .be.rejectedWith(errors.NotFound);
-        });
-
-        it("should fail when loading a module that is not a function", async () => {
-            await expect(invoker.load(path.resolve(__dirname, "./mock/notFunc"))).to.eventually
-                .be.rejectedWith(errors.MethodNotAllowed);
-        });
-
-        it("should load moudle", async () => {
-            await expect(invoker.load(path.resolve(__dirname, "./mock/func"))).to.eventually
-                .be.fulfilled;
-        });
-
-        it("should fail when load twice", async () => {
-            await expect(invoker.load(path.resolve(__dirname, "./mock/func"))
-                .then(() => {
-                    return invoker.load(path.resolve(__dirname, "./mock/func"));
-                })).to.eventually
-                .be.rejectedWith(errors.Forbidden);
-        });
-
-        it("should invoke a function", async () => {
+        it("without argument", async () => {
             await invoker.load(path.resolve(__dirname, "./mock/func"));
             await expect(invoker.invoke()).to.eventually
                 .be.fulfilled;
         });
 
-        it(`should return "I'm Mr. Meeseeks, look at me!"`, async () => {
+        it(`then provide a result`, async () => {
             await invoker.load(path.resolve(__dirname, "./mock/func"));
             await expect(invoker.invoke()).to.eventually
                 .be.deep.equal({
@@ -80,21 +92,58 @@ describe("Invoker", () => {
                 });
         });
 
-        it("should tolerance to error of function invokation and provide an error message", async () => {
+        it("provide an error message when function throws error", async () => {
             await invoker.load(path.resolve(__dirname, "./mock/errFunc"));
             await expect(invoker.invoke()).to.eventually
                 .be.include({ isThrown: true })
-                .and.have.property("result").that.is.include("Peace among worlds");
+                .and.have.property("result")
+                .that.is.include("Peace among worlds");
         });
 
-        it("should fail when invoking destroyed Invoker", async () => {
+        it("with an argument", async () => {
+            const arg = {
+                want: "be popular at school",
+            };
+
+            await invoker.load(path.resolve(__dirname, "./mock/echoFunc"));
+            await expect(invoker.invoke(arg)).to.eventually
+                .be.include({ isThrown: false })
+                .and.have.property("result")
+                .that.equals(JSON.stringify(arg));
+        });
+
+        it("that returns Promise", async () => {
+            const arg = {
+                want: "be a more complete woman",
+            };
+
+            await invoker.load(path.resolve(__dirname, "./mock/echoPromiseFunc"));
+            await expect(invoker.invoke(arg)).to.eventually
+                .be.include({ isThrown: false })
+                .and.have.property("result")
+                .that.equals(JSON.stringify(arg));
+        });
+
+        it("that is async", async () => {
+            const arg = {
+                want: "two strokes off",
+            };
+
+            await invoker.load(path.resolve(__dirname, "./mock/echoAsyncFunc"));
+            await expect(invoker.invoke(arg)).to.eventually
+                .be.include({ isThrown: false })
+                .and.have.property("result")
+                .that.equals(JSON.stringify(arg));
+        });
+
+        it("but fail when the invoker is destroyed", async () => {
             invoker.destroy();
             await expect(invoker.invoke()).to.eventually
                 .be.rejectedWith(errors.BadRequest);
         });
     });
 
-    describe("new invoker vs cached invoker", () => {
+    describe("that is already load function is more faster than that is not loaded", () => {
         let invoker: Invoker;
 
         after(() => {

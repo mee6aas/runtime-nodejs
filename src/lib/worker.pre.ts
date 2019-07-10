@@ -3,6 +3,7 @@ if (require.main !== module) {
 }
 
 import * as CODE from "http-status-codes";
+import { tryDeserialize, trySerialize } from "./util.pre";
 import Message from "./workerMessage.pre";
 
 const OK = Message.createString(CODE.OK);
@@ -23,8 +24,20 @@ function _send(message: string | Message) {
     process.send(msg);
 }
 
+function handleResult(rst: any) {
+    const json = trySerialize(rst);
+
+    if (json === null) {
+        _send(new Message(CODE.RESET_CONTENT, "Not a JSON"));
+        return;
+    }
+
+    _send(new Message(CODE.OK, json));
+    return;
+}
+
 process.once("message", (trg) => {
-    let task;
+    let task: any;
 
     try {
         task = require(trg);
@@ -44,22 +57,33 @@ process.once("message", (trg) => {
 
     _send(OK);
 
-    // TODO: make message to Message
-    process.on("message", task.constructor.name === "AsyncFunction"
-        ? (msg) => {
-            task(msg).then((rst) => {
-                _send(new Message(CODE.OK, JSON.stringify(rst)));
-            }, (err) => {
-                _send(new Message(CODE.RESET_CONTENT, err.stack));
-            });
+    process.on("message", (msg: string) => {
+        let rst: any;
+        const input = tryDeserialize(msg);
+
+        if (input === null) {
+            _send(new Message(CODE.BAD_REQUEST, "Input must be serialized JSON string"));
+            return;
         }
-        : (msg) => {
-            try {
-                const rst = task(msg);
-                _send(new Message(CODE.OK, JSON.stringify(rst)));
-            } catch (err) {
-                _send(new Message(CODE.RESET_CONTENT, err.stack));
-            }
-        },
-    );
+
+        try {
+            rst = task(input);
+        } catch (e) {
+            _send(new Message(CODE.RESET_CONTENT, e.stack));
+            return;
+        }
+
+        if (!(rst instanceof Promise)) {
+            handleResult(rst);
+            return;
+        }
+
+        rst.then((r) => {
+            handleResult(r);
+            return;
+        }, (e) => {
+            _send(new Message(CODE.RESET_CONTENT, e.stack));
+            return;
+        });
+    });
 });

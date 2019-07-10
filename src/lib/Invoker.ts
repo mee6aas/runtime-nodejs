@@ -3,6 +3,7 @@ import * as path from "path";
 
 import * as errors from "http-errors";
 import * as CODE from "http-status-codes";
+import { trySerialize } from "./util.pre";
 
 import Message from "./workerMessage.pre";
 
@@ -93,7 +94,7 @@ class Invoker {
         });
     }
 
-    public invoke(trg: string = "") {
+    public invoke(arg?: any) {
         return this._checkAvailable().then(() => {
             return new Promise<IInvokeResult>((resolve, reject) => {
                 if (this._isRunning) {
@@ -101,9 +102,14 @@ class Invoker {
                     return;
                 }
 
+                const input = trySerialize(arg);
+                if (input === null) {
+                    reject(new errors.BadRequest("Input must be serializable to JSON"));
+                    return;
+                }
+
                 this._isRunning = true;
 
-                this._worker.send(path.resolve(trg));
                 this._worker.once("message", (msg) => {
                     const res = Message.parse(msg);
                     const err = res.toError();
@@ -120,6 +126,7 @@ class Invoker {
 
                     resolve(rst);
                 });
+                this._worker.send(input);
             }).finally(() => {
                 this._isRunning = false;
             });

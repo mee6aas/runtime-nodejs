@@ -13,7 +13,7 @@ describe("Router client with the mock server", () => {
         mockServer.stop();
     });
 
-    it("should failed to connect to the router server after timeout", async () => {
+    it("fail to connect to the router server after timeout", async () => {
         const timeout = 100;
 
         try {
@@ -23,13 +23,13 @@ describe("Router client with the mock server", () => {
         }
     });
 
-    it("should connect to the router server", async () => {
+    it("can connect to the router server", async () => {
         mockServer.serve();
 
         await routerClient.connect();
     });
 
-    it("should send and receive a message to/from the router server", (done) => {
+    it("sends and receives a message to/from the router server", (done) => {
         const data = "Hello";
 
         mockServer.enableEchoMode();
@@ -51,7 +51,7 @@ describe("Router client with the mock server", () => {
         routerClient.send(data);
     });
 
-    it("should not be listen to the router server more than once", (done) => {
+    it("fail if listen to the router server more than once", (done) => {
         const accepted = routerClient.listen();
         const refused = routerClient.listen();
 
@@ -67,7 +67,7 @@ describe("Router client with the mock server", () => {
         });
     });
 
-    it("should close the connection to the router server", () => {
+    it("can close the connection to the router server", () => {
         routerClient.close();
     });
 });
