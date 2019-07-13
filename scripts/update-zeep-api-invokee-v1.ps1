@@ -1,9 +1,9 @@
 $WORKSPACE = Join-Path $PSScriptRoot ".." -Resolve
 
 $PROTO_PATH = "https://raw.github.com/mee6aas/zeep/master/api/proto/v1/"
-$PROTO_FILE = "router.proto"
+$PROTO_FILE = "invokee.proto"
 
-$OUT = "$WORKSPACE\src\api\proto\v1\"
+$OUT = "$WORKSPACE\src\lib\api\proto\invokee\v1\"
 
 $GRPC_TOOLS_NODE_PROTOC_PATH = "$WORKSPACE\node_modules\.bin\grpc_tools_node_protoc.cmd"
 $PROTOC_NODE_PLUGIN_PATH = "$WORKSPACE\node_modules\.bin\grpc_tools_node_protoc_plugin.cmd"

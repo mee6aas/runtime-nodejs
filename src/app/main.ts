@@ -1,13 +1,13 @@
-import * as routerMsg from "../lib/api/proto/v1/router_pb";
-import RouterClient from "../lib/RouterClient";
+import * as invokeeMsg from "../lib/api/proto/invokee/v1/invokee_pb";
+import InvokeeClient from "../lib/InvokeeClient";
 
 async function main() {
-    const routerClient = new RouterClient();
+    const routerClient = new InvokeeClient();
 
     await routerClient.connect();
 
     const stream = routerClient.listen();
-    stream.on("data", (data: routerMsg.Message) => {
+    stream.on("data", (data: invokeeMsg.Task) => {
         console.log(data); // tslint:disable-line no-console
     });
 
