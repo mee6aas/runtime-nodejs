@@ -4,7 +4,6 @@
   "description": "",
   "scripts": {
     "test": "gulp test",
-    "prebuild": "gulp prebuild",
     "build": "gulp build",
     "clean": "gulp clean"
   },

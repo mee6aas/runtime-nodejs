@@ -59,8 +59,8 @@ function createCleaner(trg) { return () => { return del(trg) } }
 const dryCleanBuild = giveName(createDryCleaner("./build"), "dry clean build folder")
 const cleanBuild = giveName(createCleaner("./build"), "clean build folder")
 
-const dryClean = dryCleanBuild
-const clean = cleanBuild
+const dryClean = giveName(dryCleanBuild, "dryClean")
+const clean = giveName(cleanBuild, "clean")
 
 module.exports = {
     // build files in tsconfig.json.include

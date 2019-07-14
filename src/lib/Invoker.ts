@@ -1,7 +1,7 @@
 import * as errors from "http-errors";
 
 class Invoker {
-    private task: (any?) => any;
+    private task: (task?: any) => any;
 
     public load(trg: string) {
         let task: any;

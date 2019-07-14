@@ -1,4 +1,5 @@
-export class Common {
-    static readonly KYLE_STORAGE = "/kyle"
-    static readonly WORKFLOW_STORAGE = "/kyle/flow"
+export default class Common {
+    public static readonly ACTIVITY_STORAGE = "/act";
+    public static readonly ACTIVITY_RESOURCE = "/act/rsc";
+    public static readonly WORKFLOW_STORAGE = "/flow";
 }

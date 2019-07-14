@@ -17,8 +17,7 @@ class InvokeeClient {
 
         return new Promise<void>((resolve, reject) => {
             this._client.waitForReady(Date.now() + timeout, (err) => {
-                if (err) { reject(err); }
-                resolve();
+                err ? reject(err) : resolve();
             });
         });
     }
@@ -29,6 +28,19 @@ class InvokeeClient {
         const req = new invokeeMsg.ListenRequest();
 
         return this._client.listen(req);
+    }
+
+    public report(task: invokeeMsg.Task, result: string, isError: boolean) {
+        const req = new invokeeMsg.ReportRequest();
+        req.setId(task.getId());
+        req.setResult(result);
+        req.setIserror(isError);
+
+        return new Promise((resolve, reject) => {
+            this._client.report(req, (err, res) => {
+                err ? reject(err) : resolve(res);
+            });
+        });
     }
 }
 

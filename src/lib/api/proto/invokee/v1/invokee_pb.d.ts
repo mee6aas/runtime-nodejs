@@ -23,6 +23,9 @@ export namespace ListenRequest {
 }
 
 export class Task extends jspb.Message { 
+    getId(): string;
+    setId(value: string): void;
+
     getArg(): string;
     setArg(value: string): void;
 
@@ -39,6 +42,53 @@ export class Task extends jspb.Message {
 
 export namespace Task {
     export type AsObject = {
+        id: string,
         arg: string,
+    }
+}
+
+export class ReportRequest extends jspb.Message { 
+    getId(): string;
+    setId(value: string): void;
+
+    getResult(): string;
+    setResult(value: string): void;
+
+    getIserror(): boolean;
+    setIserror(value: boolean): void;
+
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): ReportRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: ReportRequest): ReportRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: ReportRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ReportRequest;
+    static deserializeBinaryFromReader(message: ReportRequest, reader: jspb.BinaryReader): ReportRequest;
+}
+
+export namespace ReportRequest {
+    export type AsObject = {
+        id: string,
+        result: string,
+        iserror: boolean,
+    }
+}
+
+export class ReportResponse extends jspb.Message { 
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): ReportResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: ReportResponse): ReportResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: ReportResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ReportResponse;
+    static deserializeBinaryFromReader(message: ReportResponse, reader: jspb.BinaryReader): ReportResponse;
+}
+
+export namespace ReportResponse {
+    export type AsObject = {
     }
 }

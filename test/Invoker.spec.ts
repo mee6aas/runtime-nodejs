@@ -10,10 +10,8 @@ use(chaiAsPromised);
 
 // tslint:disable: no-unused-expression
 
-// TODO: test to see what error occurred.
-
 describe("Invoker", () => {
-    describe("loads a function", () => {
+    describe("loads an activity", () => {
         let invoker: Invoker;
 
         beforeEach(() => {
@@ -25,18 +23,18 @@ describe("Invoker", () => {
                 .to.not.throw();
         });
 
-        it("but fail if the function that can not be found.", () => {
+        it("but fail if the activity that can not be found.", () => {
             expect(() => { invoker.load("not exists"); })
                 .to.throw(errors.NotFound);
         });
 
-        it("but fail if the function is not a function.", () => {
+        it("but fail if the activity is not a function.", () => {
             expect(() => { invoker.load(path.resolve(__dirname, "./mock/notFunc")); })
                 .to.throw(errors.MethodNotAllowed);
         });
     });
 
-    describe("invokes a function", () => {
+    describe("invokes an activity", () => {
         let invoker: Invoker;
 
         beforeEach(() => {
@@ -58,7 +56,8 @@ describe("Invoker", () => {
         it("and provides an error message when invocation throws an error.", async () => {
             await invoker.load(path.resolve(__dirname, "./mock/errFunc"));
             await expect(invoker.invoke()).to.eventually
-                .be.not.rejected;
+                .be.rejected.and.have.property("message")
+                .that.equals("Peace among worlds");
         });
 
         it("with an argument.", async () => {
