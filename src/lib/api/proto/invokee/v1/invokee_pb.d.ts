@@ -23,6 +23,9 @@ export namespace ListenRequest {
 }
 
 export class Task extends jspb.Message { 
+    getType(): TaskType;
+    setType(value: TaskType): void;
+
     getId(): string;
     setId(value: string): void;
 
@@ -42,6 +45,7 @@ export class Task extends jspb.Message {
 
 export namespace Task {
     export type AsObject = {
+        type: TaskType,
         id: string,
         arg: string,
     }
@@ -91,4 +95,10 @@ export class ReportResponse extends jspb.Message {
 export namespace ReportResponse {
     export type AsObject = {
     }
+}
+
+export enum TaskType {
+    UNKNOWN = 0,
+    LOAD = 1,
+    INVOKE = 2,
 }

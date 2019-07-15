@@ -72,17 +72,27 @@ function getReport() {
     });
 }
 
+function assignTask(conn: grpc.ServerWriteableStream<invokeeMsg.Task>, task: invokeeMsg.Task) {
+    return new Promise((resolve, reject) => {
+        conn.write(task, (err) => { err ? reject(err) : resolve(); });
+    });
+}
+
 function invoke(id: string, arg?: any) {
     if (lastInvoke === undefined) { throw new Error("call getReport first"); }
 
-    return onListen().then((conn: grpc.ServerWriteableStream<invokeeMsg.Task>) => {
+    return onListen().then(async (conn: grpc.ServerWriteableStream<invokeeMsg.Task>) => {
+        const load = new invokeeMsg.Task();
+        load.setType(invokeeMsg.TaskType.LOAD);
+        load.setId("."); // without resource ID
+
         const task = new invokeeMsg.Task();
+        task.setType(invokeeMsg.TaskType.INVOKE);
         task.setId(id);
         task.setArg(utils.serialize(arg));
 
-        return new Promise((resolve, reject) => {
-            conn.write(task, (err) => { err ? reject(err) : resolve(); });
-        });
+        await assignTask(conn, load);
+        return assignTask(conn, task);
     });
 }
 

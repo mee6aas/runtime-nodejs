@@ -53,7 +53,8 @@ function testSpecs() {
 
     return gulp.src("./test/**/*.spec.ts")
         .pipe(mocha({
-            require: ['ts-node/register']
+            require: ['ts-node/register'],
+            bail: true,
         }))
         .on("error", function () {
             this.emit("end")

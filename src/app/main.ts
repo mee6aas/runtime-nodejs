@@ -19,15 +19,19 @@ const dftOpt: IAppOpt = {
 async function main(opt: IAppOpt = dftOpt) {
     const invokeeClient = new InvokeeClient();
     await invokeeClient.connect().catch((err) => {
-        console.error(err);
-        process.exit(1);
+        throw err;
     });
 
     const invoker = new Invoker();
 
     let taskHandler = (task: invokeeMsg.Task) => {
+        if (task.getType() !== invokeeMsg.TaskType.LOAD) {
+            throw new Error("First Task must be type LOAD");
+        }
 
-        const handler = (t: invokeeMsg.Task) => {
+        invoker.load(path.resolve(opt.api.ACTIVITY_RESOURCE, task.getId(), opt.entryPoint));
+
+        taskHandler = (t: invokeeMsg.Task) => {
             const input = utils.tryDeserialize(t.getArg());
             invoker.invoke(input).then((rst) => {
                 return invokeeClient.report(t, utils.serialize(rst), false);
@@ -35,14 +39,10 @@ async function main(opt: IAppOpt = dftOpt) {
                 return invokeeClient.report(t, utils.serialize(err), true);
             });
         };
-
-        invoker.load(path.join(opt.api.ACTIVITY_RESOURCE, opt.entryPoint));
-        taskHandler = handler;
-        handler(task);
     };
 
     const stream = invokeeClient.listen();
-    stream.on("data", taskHandler);
+    stream.on("data", (t) => { taskHandler(t); });
     stream.on("error", () => {
         // TODO: handle
     });
