@@ -18,7 +18,10 @@ const dftOpt: IAppOpt = {
 
 async function main(opt: IAppOpt = dftOpt) {
     const invokeeClient = new InvokeeClient();
-    await invokeeClient.connect();
+    await invokeeClient.connect().catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });
 
     const invoker = new Invoker();
 
@@ -27,13 +30,9 @@ async function main(opt: IAppOpt = dftOpt) {
         const handler = (t: invokeeMsg.Task) => {
             const input = utils.tryDeserialize(t.getArg());
             invoker.invoke(input).then((rst) => {
-                const output = utils.trySerialize(rst);
-
-                return invokeeClient.report(t, output === null ? "" : output, false);
+                return invokeeClient.report(t, utils.serialize(rst), false);
             }, (err) => {
-                const output = utils.trySerialize(err);
-
-                return invokeeClient.report(t, output === null ? "" : output, true);
+                return invokeeClient.report(t, utils.serialize(err), true);
             });
         };
 

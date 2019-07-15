@@ -1,15 +1,15 @@
-import { format } from "util";
+import { format, isString } from "util";
 
-function trySerialize(val: any | undefined) {
+function serialize(val: any | undefined) {
     if (val === undefined) { return ""; }
     if (val instanceof Error) { return format(val); }
 
-    let json: string | null;
+    let json: string;
 
     try {
         json = JSON.stringify(val);
     } catch {
-        json = null;
+        json = "";
     }
 
     return json;
@@ -19,18 +19,20 @@ function tryDeserialize(val: string | undefined) {
     if (val === undefined) { return undefined; }
     if (val === "") { return undefined; }
 
-    let obj: object | null;
+    let obj: any;
 
     try {
         obj = JSON.parse(val);
     } catch {
-        obj = null;
+        isString(val)
+            ? obj = val
+            : obj = null;
     }
 
     return obj;
 }
 
 export default {
-    trySerialize,
+    serialize,
     tryDeserialize,
 };

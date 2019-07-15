@@ -41,13 +41,7 @@ describe("Invoker", () => {
             invoker = new Invoker();
         });
 
-        it("without argument.", async () => {
-            await invoker.load(path.resolve(__dirname, "./mock/func"));
-            await expect(invoker.invoke()).to.eventually
-                .be.fulfilled;
-        });
-
-        it(`then provide a result.`, async () => {
+        it("without argument and provide result.", async () => {
             await invoker.load(path.resolve(__dirname, "./mock/func"));
             await expect(invoker.invoke()).to.eventually
                 .be.deep.equal("I'm Mr. Meeseeks, look at me!");

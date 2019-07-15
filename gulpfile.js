@@ -17,18 +17,31 @@ function giveName(fn, name) {
 }
 
 //
+// clean
+//
+
+function createDryCleaner(trg) { return () => { return del(trg, { dryRun: true }).then(trg => console.log(trg, "will be deleted")) } }
+function createCleaner(trg) { return () => { return del(trg) } }
+
+const dryCleanBuild = giveName(createDryCleaner("./build"), "dry clean build folder")
+const cleanBuild = giveName(createCleaner("./build"), "clean build folder")
+
+const dryClean = giveName(dryCleanBuild, "dryClean")
+const clean = giveName(cleanBuild, "clean")
+
+//
 // build
 //
 
-function buildSources() {
+async function buildSources(cb) {
     let tsProject = ts.createProject("tsconfig.json");
 
     return tsProject.src()
         .pipe(tsProject())
-        .js.pipe(gulp.dest(tsProject.options.outDir));
+        .js.pipe(gulp.dest(tsProject.options.outDir))
 }
 
-const build = buildSources;
+const build = gulp.series(dryClean, clean, buildSources);
 
 //
 // test
@@ -48,19 +61,6 @@ function testSpecs() {
 }
 
 const test = testSpecs
-
-//
-// clean
-//
-
-function createDryCleaner(trg) { return () => { return del(trg, { dryRun: true }).then(trg => console.log(trg, "will be deleted")) } }
-function createCleaner(trg) { return () => { return del(trg) } }
-
-const dryCleanBuild = giveName(createDryCleaner("./build"), "dry clean build folder")
-const cleanBuild = giveName(createCleaner("./build"), "clean build folder")
-
-const dryClean = giveName(dryCleanBuild, "dryClean")
-const clean = giveName(cleanBuild, "clean")
 
 module.exports = {
     // build files in tsconfig.json.include

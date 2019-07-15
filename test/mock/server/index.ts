@@ -4,6 +4,7 @@ import * as grpc from "grpc";
 
 import * as invokeeSvc from "../../../src/lib/api/proto/invokee/v1/invokee_grpc_pb";
 import * as invokeeMsg from "../../../src/lib/api/proto/invokee/v1/invokee_pb";
+import utils from "../../../src/lib/utils";
 
 let server: grpc.Server;
 const serverEvent = new EventEmitter();
@@ -71,12 +72,13 @@ function getReport() {
     });
 }
 
-function invoke(id: string) {
+function invoke(id: string, arg?: any) {
     if (lastInvoke === undefined) { throw new Error("call getReport first"); }
 
     return onListen().then((conn: grpc.ServerWriteableStream<invokeeMsg.Task>) => {
         const task = new invokeeMsg.Task();
         task.setId(id);
+        task.setArg(utils.serialize(arg));
 
         return new Promise((resolve, reject) => {
             conn.write(task, (err) => { err ? reject(err) : resolve(); });
