@@ -12,6 +12,33 @@ use(chaiAsPromised);
 
 describe("app with the mock server", () => {
 
+    describe("loads an activity", () => {
+
+        before(() => {
+            mockServer.serve();
+        });
+
+        after(() => {
+            mockServer.stop();
+        });
+
+        it("with proper argument.", async () => {
+            const handle = await app({
+                api: { ACTIVITY_RESOURCE: path.resolve(__dirname) },
+                entryPoint: "func",
+            });
+
+            {
+                const reported = mockServer.getReport();
+                await mockServer.load("mock");
+                const result = await reported;
+                expect(result.getIserror()).to.be.equal(false);
+            }
+
+            handle.stop();
+        })
+    })
+
     describe("invokes an activity", () => {
 
         before(() => {
@@ -25,23 +52,33 @@ describe("app with the mock server", () => {
         it("without argument and provide result.", async () => {
             const invokeID = "C-137";
             const handle = await app({
-                api: { ACTIVITY_RESOURCE: path.resolve(__dirname, "./mock") },
+                api: { ACTIVITY_RESOURCE: path.resolve(__dirname) },
                 entryPoint: "func",
             });
 
-            const reported = mockServer.getReport();
-            await mockServer.invoke(invokeID);
-            const result = await reported;
+            {
+                const reported = mockServer.getReport();
+                await mockServer.load("mock");
+                const result = await reported;
+                expect(result.getIserror()).to.be.equal(false);
+            }
 
-            expect({
-                id: result.getId(),
-                rst: JSON.parse(result.getResult()),
-                isErr: result.getIserror(),
-            }).to.be.deep.equal({
-                id: invokeID,
-                rst: "I'm Mr. Meeseeks, look at me!",
-                isErr: false,
-            });
+
+            {
+                const reported = mockServer.getReport();
+                await mockServer.invoke(invokeID);
+                const result = await reported;
+
+                expect({
+                    id: result.getId(),
+                    rst: JSON.parse(result.getResult()),
+                    isErr: result.getIserror(),
+                }).to.be.deep.equal({
+                    id: invokeID,
+                    rst: "I'm Mr. Meeseeks, look at me!",
+                    isErr: false,
+                });
+            }
 
             handle.stop();
         });
@@ -49,23 +86,33 @@ describe("app with the mock server", () => {
         it("and provides an error message when invocation throws an error.", async () => {
             const invokeID = "C-137";
             const handle = await app({
-                api: { ACTIVITY_RESOURCE: path.resolve(__dirname, "./mock") },
+                api: { ACTIVITY_RESOURCE: path.resolve(__dirname) },
                 entryPoint: "errFunc",
             });
 
-            const reported = mockServer.getReport();
-            await mockServer.invoke(invokeID);
-            const result = await reported;
 
-            expect({
-                id: result.getId(),
-                isErr: result.getIserror(),
-            }).to.be.deep.equal({
-                id: invokeID,
-                isErr: true,
-            });
+            {
+                const reported = mockServer.getReport();
+                await mockServer.load("mock");
+                const result = await reported;
+                expect(result.getIserror()).to.be.equal(false);
+            }
 
-            expect(result.getResult()).to.be.include("Peace among worlds");
+            {
+                const reported = mockServer.getReport();
+                await mockServer.invoke(invokeID);
+                const result = await reported;
+
+                expect({
+                    id: result.getId(),
+                    isErr: result.getIserror(),
+                }).to.be.deep.equal({
+                    id: invokeID,
+                    isErr: true,
+                });
+
+                expect(result.getResult()).to.be.include("Peace among worlds");
+            }
 
             handle.stop();
         });
@@ -74,23 +121,33 @@ describe("app with the mock server", () => {
             const invokeID = "C-137";
             const arg = { want: "open Jerry's stupid mayonnaise jar" };
             const handle = await app({
-                api: { ACTIVITY_RESOURCE: path.resolve(__dirname, "./mock") },
+                api: { ACTIVITY_RESOURCE: path.resolve(__dirname) },
                 entryPoint: "echoFunc",
             });
 
-            const reported = mockServer.getReport();
-            await mockServer.invoke(invokeID, arg);
-            const result = await reported;
 
-            expect({
-                id: result.getId(),
-                rst: JSON.parse(result.getResult()),
-                isErr: result.getIserror(),
-            }).to.be.deep.equal({
-                id: invokeID,
-                rst: arg,
-                isErr: false,
-            });
+            {
+                const reported = mockServer.getReport();
+                await mockServer.load("mock");
+                const result = await reported;
+                expect(result.getIserror()).to.be.equal(false);
+            }
+
+            {
+                const reported = mockServer.getReport();
+                await mockServer.invoke(invokeID, arg);
+                const result = await reported;
+
+                expect({
+                    id: result.getId(),
+                    rst: JSON.parse(result.getResult()),
+                    isErr: result.getIserror(),
+                }).to.be.deep.equal({
+                    id: invokeID,
+                    rst: arg,
+                    isErr: false,
+                });
+            }
 
             handle.stop();
         });

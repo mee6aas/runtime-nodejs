@@ -29,7 +29,7 @@ async function main(opt: IAppOpt = dftOpt) {
             throw new Error("First Task must be type LOAD");
         }
 
-        invoker.load(path.resolve(opt.api.ACTIVITY_RESOURCE, task.getId(), opt.entryPoint));
+        invoker.load(path.resolve(opt.api.ACTIVITY_RESOURCE, task.getArg(), opt.entryPoint));
 
         taskHandler = (t: invokeeMsg.Task) => {
             const input = utils.tryDeserialize(t.getArg());
@@ -39,6 +39,10 @@ async function main(opt: IAppOpt = dftOpt) {
                 return invokeeClient.report(t, utils.serialize(err), true);
             });
         };
+
+        invokeeClient.report(task, "", false).then(_ => { }, err => {
+            throw err
+        })
     };
 
     const stream = invokeeClient.listen();

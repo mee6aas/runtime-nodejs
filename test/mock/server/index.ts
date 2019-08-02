@@ -11,9 +11,16 @@ const serverEvent = new EventEmitter();
 const conns = new Map<string, grpc.ServerWriteableStream<invokeeMsg.Task>>();
 let lastInvoke: EventEmitter | undefined;
 
-function onListen() {
+function afterListen() {
     return new Promise((resolve) => {
-        serverEvent.on("listen", (conn) => { resolve(conn); });
+        if (conns.size > 0) {
+            resolve(conns.entries().next().value[1])
+            return
+        }
+
+        serverEvent.on("listen", (conn) => {
+            resolve(conn);
+        });
     });
 }
 
@@ -78,20 +85,28 @@ function assignTask(conn: grpc.ServerWriteableStream<invokeeMsg.Task>, task: inv
     });
 }
 
-function invoke(id: string, arg?: any) {
+function load(arg: string) {
     if (lastInvoke === undefined) { throw new Error("call getReport first"); }
 
-    return onListen().then(async (conn: grpc.ServerWriteableStream<invokeeMsg.Task>) => {
+    return afterListen().then(async (conn: grpc.ServerWriteableStream<invokeeMsg.Task>) => {
         const load = new invokeeMsg.Task();
         load.setType(invokeeMsg.TaskType.LOAD);
         load.setId("."); // without resource ID
+        load.setArg(arg)
 
+        await assignTask(conn, load);
+    });
+}
+
+function invoke(id: string, arg?: any) {
+    if (lastInvoke === undefined) { throw new Error("call getReport first"); }
+
+    return afterListen().then(async (conn: grpc.ServerWriteableStream<invokeeMsg.Task>) => {
         const task = new invokeeMsg.Task();
         task.setType(invokeeMsg.TaskType.INVOKE);
         task.setId(id);
         task.setArg(utils.serialize(arg));
 
-        await assignTask(conn, load);
         return assignTask(conn, task);
     });
 }
@@ -103,6 +118,7 @@ function stop() {
 export {
     serve,
     invoke,
+    load,
     getReport,
     stop,
 };
