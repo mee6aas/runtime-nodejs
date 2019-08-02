@@ -10,7 +10,7 @@ use(chaiAsPromised);
 
 // tslint:disable: no-unused-expression
 
-describe.only("app with the mock server", () => {
+describe("app with the mock server", () => {
 
     describe("invokes an activity", () => {
 
