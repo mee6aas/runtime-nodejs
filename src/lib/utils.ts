@@ -1,38 +1,24 @@
-import { format, isString } from "util";
+import { format, isError, isString, isUndefined, isNullOrUndefined, isNumber } from "util";
 
 function serialize(val: any | undefined) {
-    if (val === undefined) { return ""; }
-    if (val instanceof Error) { return format(val); }
-
-    let json: string;
-
-    try {
-        json = JSON.stringify(val);
-    } catch {
-        json = "";
-    }
-
-    return json;
-}
-
-function tryDeserialize(val: string | undefined) {
-    if (val === undefined) { return undefined; }
-    if (val === "") { return undefined; }
-
-    let obj: any;
+    if (isString(val)) { return val; }
+    if (isUndefined(val)) { return "undefined"; }
+    if (isError(val)) { return format(val); }
+    if (isNumber(val)) { return isNaN(val) ? "NaN" : val.toString() }
 
     try {
-        obj = JSON.parse(val);
-    } catch {
-        isString(val)
-            ? obj = val
-            : obj = null;
-    }
+        return serialize(JSON.stringify(val));
+    } catch (_) { }
 
-    return obj;
+    if (typeof val === "bigint") { return val.toString(); }
+
+    if (isNullOrUndefined(val.toString)) {
+        return "";
+    } else {
+        return val.toString();
+    }
 }
 
-export default {
-    serialize,
-    tryDeserialize,
-};
+export {
+    serialize
+}

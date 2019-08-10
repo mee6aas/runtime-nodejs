@@ -4,7 +4,7 @@ import * as grpc from "grpc";
 
 import * as invokeeSvc from "../../../src/lib/api/proto/invokee/v1/invokee_grpc_pb";
 import * as invokeeMsg from "../../../src/lib/api/proto/invokee/v1/invokee_pb";
-import utils from "../../../src/lib/utils";
+import * as utils from "../../../src/lib/utils";
 
 let server: grpc.Server;
 const serverEvent = new EventEmitter();

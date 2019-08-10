@@ -32,7 +32,7 @@ describe("app with the mock server", () => {
                 const reported = mockServer.getReport();
                 await mockServer.load("mock");
                 const result = await reported;
-                expect(result.getIserror()).to.be.equal(false);
+                expect(result.getIserror()).to.equal(false);
             }
 
             handle.stop();
@@ -60,7 +60,7 @@ describe("app with the mock server", () => {
                 const reported = mockServer.getReport();
                 await mockServer.load("mock");
                 const result = await reported;
-                expect(result.getIserror()).to.be.equal(false);
+                expect(result.getIserror()).to.equal(false);
             }
 
 
@@ -71,9 +71,9 @@ describe("app with the mock server", () => {
 
                 expect({
                     id: result.getId(),
-                    rst: JSON.parse(result.getResult()),
+                    rst: result.getResult(),
                     isErr: result.getIserror(),
-                }).to.be.deep.equal({
+                }).to.deep.equal({
                     id: invokeID,
                     rst: "I'm Mr. Meeseeks, look at me!",
                     isErr: false,
@@ -95,7 +95,7 @@ describe("app with the mock server", () => {
                 const reported = mockServer.getReport();
                 await mockServer.load("mock");
                 const result = await reported;
-                expect(result.getIserror()).to.be.equal(false);
+                expect(result.getIserror()).to.equal(false);
             }
 
             {
@@ -106,12 +106,12 @@ describe("app with the mock server", () => {
                 expect({
                     id: result.getId(),
                     isErr: result.getIserror(),
-                }).to.be.deep.equal({
+                }).to.deep.equal({
                     id: invokeID,
                     isErr: true,
                 });
 
-                expect(result.getResult()).to.be.include("Peace among worlds");
+                expect(result.getResult()).to.include("Peace among worlds");
             }
 
             handle.stop();
@@ -130,7 +130,7 @@ describe("app with the mock server", () => {
                 const reported = mockServer.getReport();
                 await mockServer.load("mock");
                 const result = await reported;
-                expect(result.getIserror()).to.be.equal(false);
+                expect(result.getIserror()).to.equal(false);
             }
 
             {
@@ -142,7 +142,7 @@ describe("app with the mock server", () => {
                     id: result.getId(),
                     rst: JSON.parse(result.getResult()),
                     isErr: result.getIserror(),
-                }).to.be.deep.equal({
+                }).to.deep.equal({
                     id: invokeID,
                     rst: arg,
                     isErr: false,

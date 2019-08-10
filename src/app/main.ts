@@ -4,7 +4,7 @@ import API from "../lib/api/common";
 import * as invokeeMsg from "../lib/api/proto/invokee/v1/invokee_pb";
 import InvokeeClient from "../lib/InvokeeClient";
 import Invoker from "../lib/Invoker";
-import utils from "../lib/utils";
+import * as utils from "../lib/utils";
 
 interface IAppOpt {
     api: any;
@@ -32,7 +32,7 @@ async function main(opt: IAppOpt = dftOpt) {
         invoker.load(path.resolve(opt.api.ACTIVITY_RESOURCE, task.getArg(), opt.entryPoint));
 
         taskHandler = (t: invokeeMsg.Task) => {
-            const input = utils.tryDeserialize(t.getArg());
+            const input = utils.serialize(t.getArg());
             invoker.invoke(input).then((rst) => {
                 return invokeeClient.report(t, utils.serialize(rst), false);
             }, (err) => {

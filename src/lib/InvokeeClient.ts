@@ -6,12 +6,14 @@ class InvokeeClient {
     private _client: invokeeSvc.InvokeeClient;
 
     public async connect(timeout = 1000 * 60) {
-        this._client = new invokeeSvc.InvokeeClient(
-            `${
+        const AGENT_ADDR = `${
             process.env.AGENT_HOST || "0.0.0.0"
             }:${
             process.env.AGENT_PORT || 50051
-            }`,
+            }`
+
+        this._client = new invokeeSvc.InvokeeClient(
+            AGENT_ADDR,
             grpc.credentials.createInsecure(),
         );
 
