@@ -14,8 +14,8 @@ let lastInvoke: EventEmitter | undefined;
 function afterListen() {
     return new Promise((resolve) => {
         if (conns.size > 0) {
-            resolve(conns.entries().next().value[1])
-            return
+            resolve(conns.entries().next().value[1]);
+            return;
         }
 
         serverEvent.on("listen", (conn) => {
@@ -57,7 +57,7 @@ function report(
     cb(null, res);
 }
 
-function serve(port = 50051, hostname = "0.0.0.0") {
+function serve(port = 5122, hostname = "0.0.0.0") {
     server = new grpc.Server();
     server.addService(invokeeSvc.InvokeeService, {
         listen,
@@ -92,7 +92,7 @@ function load(arg: string) {
         const load = new invokeeMsg.Task();
         load.setType(invokeeMsg.TaskType.LOAD);
         load.setId("."); // without resource ID
-        load.setArg(arg)
+        load.setArg(arg);
 
         await assignTask(conn, load);
     });

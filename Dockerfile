@@ -2,8 +2,11 @@ FROM node:12.6-alpine
 
 WORKDIR /usr/runtime
 
-COPY ["./build/", "./package*", "./"]
+COPY ["./package*", "./"]
 
-RUN npm install --production
+RUN apk add --no-cache git=2.20.1-r0 \
+ && npm install --production 
+
+COPY ["./build/", "./"]
 
 CMD [ "node", "./app/main.js" ]

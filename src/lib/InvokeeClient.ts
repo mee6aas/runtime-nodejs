@@ -9,9 +9,10 @@ class InvokeeClient {
         const AGENT_ADDR = `${
             process.env.AGENT_HOST || "0.0.0.0"
             }:${
-            process.env.AGENT_PORT || 50051
+            process.env.AGENT_PORT || 5122
             }`
 
+        console.log(`trying connect to ${AGENT_ADDR}`)
         this._client = new invokeeSvc.InvokeeClient(
             AGENT_ADDR,
             grpc.credentials.createInsecure(),

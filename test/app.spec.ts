@@ -26,6 +26,7 @@ describe("app with the mock server", () => {
             const handle = await app({
                 api: { ACTIVITY_RESOURCE: path.resolve(__dirname) },
                 entryPoint: "func",
+                withCopy: false,
             });
 
             {
@@ -36,8 +37,8 @@ describe("app with the mock server", () => {
             }
 
             handle.stop();
-        })
-    })
+        });
+    });
 
     describe("invokes an activity", () => {
 
@@ -54,6 +55,7 @@ describe("app with the mock server", () => {
             const handle = await app({
                 api: { ACTIVITY_RESOURCE: path.resolve(__dirname) },
                 entryPoint: "func",
+                withCopy: false,
             });
 
             {
@@ -62,7 +64,6 @@ describe("app with the mock server", () => {
                 const result = await reported;
                 expect(result.getIserror()).to.equal(false);
             }
-
 
             {
                 const reported = mockServer.getReport();
@@ -88,8 +89,8 @@ describe("app with the mock server", () => {
             const handle = await app({
                 api: { ACTIVITY_RESOURCE: path.resolve(__dirname) },
                 entryPoint: "errFunc",
+                withCopy: false,
             });
-
 
             {
                 const reported = mockServer.getReport();
@@ -123,8 +124,8 @@ describe("app with the mock server", () => {
             const handle = await app({
                 api: { ACTIVITY_RESOURCE: path.resolve(__dirname) },
                 entryPoint: "echoFunc",
+                withCopy: false,
             });
-
 
             {
                 const reported = mockServer.getReport();
