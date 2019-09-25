@@ -97,8 +97,43 @@ export namespace ReportResponse {
     }
 }
 
+export class HandoverRequest extends jspb.Message { 
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): HandoverRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: HandoverRequest): HandoverRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: HandoverRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): HandoverRequest;
+    static deserializeBinaryFromReader(message: HandoverRequest, reader: jspb.BinaryReader): HandoverRequest;
+}
+
+export namespace HandoverRequest {
+    export type AsObject = {
+    }
+}
+
+export class HandoverResponse extends jspb.Message { 
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): HandoverResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: HandoverResponse): HandoverResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: HandoverResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): HandoverResponse;
+    static deserializeBinaryFromReader(message: HandoverResponse, reader: jspb.BinaryReader): HandoverResponse;
+}
+
+export namespace HandoverResponse {
+    export type AsObject = {
+    }
+}
+
 export enum TaskType {
     UNKNOWN = 0,
     LOAD = 1,
     INVOKE = 2,
+    HANDOVER = 3,
 }

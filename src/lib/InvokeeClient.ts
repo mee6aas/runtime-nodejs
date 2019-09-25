@@ -5,16 +5,10 @@ import * as invokeeMsg from "./api/proto/invokee/v1/invokee_pb";
 class InvokeeClient {
     private _client: invokeeSvc.InvokeeClient;
 
-    public async connect(timeout = 1000 * 60) {
-        const AGENT_ADDR = `${
-            process.env.AGENT_HOST || "0.0.0.0"
-            }:${
-            process.env.AGENT_PORT || 5122
-            }`
-
-        console.log(`trying connect to ${AGENT_ADDR}`)
+    public async connect(addr: string, timeout = 1000 * 60) {
+        console.log(`trying connect to ${addr}`);
         this._client = new invokeeSvc.InvokeeClient(
-            AGENT_ADDR,
+            addr,
             grpc.credentials.createInsecure(),
         );
 

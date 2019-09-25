@@ -4,6 +4,28 @@
 var grpc = require('grpc');
 var invokee_pb = require('./invokee_pb.js');
 
+function serialize_mee6aas_agent_invokee_v1_HandoverRequest(arg) {
+  if (!(arg instanceof invokee_pb.HandoverRequest)) {
+    throw new Error('Expected argument of type mee6aas.agent.invokee.v1.HandoverRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_mee6aas_agent_invokee_v1_HandoverRequest(buffer_arg) {
+  return invokee_pb.HandoverRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_mee6aas_agent_invokee_v1_HandoverResponse(arg) {
+  if (!(arg instanceof invokee_pb.HandoverResponse)) {
+    throw new Error('Expected argument of type mee6aas.agent.invokee.v1.HandoverResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_mee6aas_agent_invokee_v1_HandoverResponse(buffer_arg) {
+  return invokee_pb.HandoverResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_mee6aas_agent_invokee_v1_ListenRequest(arg) {
   if (!(arg instanceof invokee_pb.ListenRequest)) {
     throw new Error('Expected argument of type mee6aas.agent.invokee.v1.ListenRequest');
@@ -71,6 +93,17 @@ var InvokeeService = exports.InvokeeService = {
     requestDeserialize: deserialize_mee6aas_agent_invokee_v1_ReportRequest,
     responseSerialize: serialize_mee6aas_agent_invokee_v1_ReportResponse,
     responseDeserialize: deserialize_mee6aas_agent_invokee_v1_ReportResponse,
+  },
+  handover: {
+    path: '/mee6aas.agent.invokee.v1.Invokee/Handover',
+    requestStream: false,
+    responseStream: false,
+    requestType: invokee_pb.HandoverRequest,
+    responseType: invokee_pb.HandoverResponse,
+    requestSerialize: serialize_mee6aas_agent_invokee_v1_HandoverRequest,
+    requestDeserialize: deserialize_mee6aas_agent_invokee_v1_HandoverRequest,
+    responseSerialize: serialize_mee6aas_agent_invokee_v1_HandoverResponse,
+    responseDeserialize: deserialize_mee6aas_agent_invokee_v1_HandoverResponse,
   },
 };
 

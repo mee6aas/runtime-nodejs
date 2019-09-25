@@ -9,6 +9,7 @@ import * as invokee_pb from "./invokee_pb";
 interface IInvokeeService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
     listen: IInvokeeService_IListen;
     report: IInvokeeService_IReport;
+    handover: IInvokeeService_IHandover;
 }
 
 interface IInvokeeService_IListen extends grpc.MethodDefinition<invokee_pb.ListenRequest, invokee_pb.Task> {
@@ -29,12 +30,22 @@ interface IInvokeeService_IReport extends grpc.MethodDefinition<invokee_pb.Repor
     responseSerialize: grpc.serialize<invokee_pb.ReportResponse>;
     responseDeserialize: grpc.deserialize<invokee_pb.ReportResponse>;
 }
+interface IInvokeeService_IHandover extends grpc.MethodDefinition<invokee_pb.HandoverRequest, invokee_pb.HandoverResponse> {
+    path: string; // "/mee6aas.agent.invokee.v1.Invokee/Handover"
+    requestStream: boolean; // false
+    responseStream: boolean; // false
+    requestSerialize: grpc.serialize<invokee_pb.HandoverRequest>;
+    requestDeserialize: grpc.deserialize<invokee_pb.HandoverRequest>;
+    responseSerialize: grpc.serialize<invokee_pb.HandoverResponse>;
+    responseDeserialize: grpc.deserialize<invokee_pb.HandoverResponse>;
+}
 
 export const InvokeeService: IInvokeeService;
 
 export interface IInvokeeServer {
     listen: grpc.handleServerStreamingCall<invokee_pb.ListenRequest, invokee_pb.Task>;
     report: grpc.handleUnaryCall<invokee_pb.ReportRequest, invokee_pb.ReportResponse>;
+    handover: grpc.handleUnaryCall<invokee_pb.HandoverRequest, invokee_pb.HandoverResponse>;
 }
 
 export interface IInvokeeClient {
@@ -43,6 +54,9 @@ export interface IInvokeeClient {
     report(request: invokee_pb.ReportRequest, callback: (error: grpc.ServiceError | null, response: invokee_pb.ReportResponse) => void): grpc.ClientUnaryCall;
     report(request: invokee_pb.ReportRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: invokee_pb.ReportResponse) => void): grpc.ClientUnaryCall;
     report(request: invokee_pb.ReportRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: invokee_pb.ReportResponse) => void): grpc.ClientUnaryCall;
+    handover(request: invokee_pb.HandoverRequest, callback: (error: grpc.ServiceError | null, response: invokee_pb.HandoverResponse) => void): grpc.ClientUnaryCall;
+    handover(request: invokee_pb.HandoverRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: invokee_pb.HandoverResponse) => void): grpc.ClientUnaryCall;
+    handover(request: invokee_pb.HandoverRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: invokee_pb.HandoverResponse) => void): grpc.ClientUnaryCall;
 }
 
 export class InvokeeClient extends grpc.Client implements IInvokeeClient {
@@ -52,4 +66,7 @@ export class InvokeeClient extends grpc.Client implements IInvokeeClient {
     public report(request: invokee_pb.ReportRequest, callback: (error: grpc.ServiceError | null, response: invokee_pb.ReportResponse) => void): grpc.ClientUnaryCall;
     public report(request: invokee_pb.ReportRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: invokee_pb.ReportResponse) => void): grpc.ClientUnaryCall;
     public report(request: invokee_pb.ReportRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: invokee_pb.ReportResponse) => void): grpc.ClientUnaryCall;
+    public handover(request: invokee_pb.HandoverRequest, callback: (error: grpc.ServiceError | null, response: invokee_pb.HandoverResponse) => void): grpc.ClientUnaryCall;
+    public handover(request: invokee_pb.HandoverRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: invokee_pb.HandoverResponse) => void): grpc.ClientUnaryCall;
+    public handover(request: invokee_pb.HandoverRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: invokee_pb.HandoverResponse) => void): grpc.ClientUnaryCall;
 }
